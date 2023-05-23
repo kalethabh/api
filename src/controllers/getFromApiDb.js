@@ -52,15 +52,21 @@ const getApiInfo = async () => {
 
 // Función para obtener la información de todos los Pokémon en la base de datos
 const getDbInfo = async () => {
-  return await Pokemon.findAll({
-    include: {
-      model: Type,
-      attributes: ["name"],
-      through: {
-        attributes: [],
+  try {
+    const arrayPokemonsDb = await Pokemon.findAll({
+      include: {
+        attributes: ["name"],
+        model: Type,
+        through: {
+          attributes: [],
+        },
       },
-    },
-  });
+    });
+
+    return arrayPokemonsDb;
+  } catch (error) {
+    return error;
+  }
 };
 
 // Función para obtener todos los Pokémon, tanto de la API como de la base de datos
