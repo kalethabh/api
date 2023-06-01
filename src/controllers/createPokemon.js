@@ -26,7 +26,7 @@ const createPokemon = async (req, res) => {
           },
         });
         pokemon.addType(typeDb);
-        return res.status(201).send("Pokemon created succesfully");
+        return res.status(200).send("Pokemon created succesfully");
       }
       return res.status(404).send("Pokemon name already exist");
     }

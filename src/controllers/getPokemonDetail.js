@@ -23,7 +23,7 @@ async function getPokemonDetail(arg) {
     };
     return pokemonData;
   } catch (e) {
-    console.log(e);
+    console.log(e); 
   }
 }
 

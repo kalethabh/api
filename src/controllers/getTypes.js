@@ -9,7 +9,7 @@ const getTypes = async (req, res)=>{
         types.forEach(type => {
             Type.findOrCreate({
                 where: {
-                    name: type,
+                    name: type, 
                 }
             });
         });

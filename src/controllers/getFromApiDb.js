@@ -13,13 +13,12 @@ const getApiInfo = async () => {
       let auxPokemones = pokemonesApi.results.map((e) => {
         return {
           name: e.name,
-          url: e.url,
-        };
-      });
-
+          url: e.url,  
+        }; 
+      }); 
       pokemones.push(...auxPokemones);
       url = pokemonesApi.next;
-    } while (url != null && pokemones.length < 40); // Puedes ajustar el límite de pokemones aquí
+    } while (url != null && pokemones.length < 165);
 
     let pokesWithData = await Promise.all(
       pokemones.map(async (e) => {

@@ -9,6 +9,7 @@ router.get("/", getPokemonRute);
 
 router.get("/:id", getPokemonById);
 
+
 router.post("/", createPokemon);
 
 module.exports = router;
