@@ -1,7 +1,7 @@
 const axios = require("axios");
 const { Pokemon, Type } = require("../db");
 
-const TOTAL_POKEMONS = 500;
+const TOTAL_POKEMONS = 100;
 
 const getApiInfo = async (page) => {
   try {
