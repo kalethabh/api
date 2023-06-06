@@ -1,7 +1,6 @@
 const axios = require("axios");
 const { Pokemon, Type } = require("../db");
 
-// Función para obtener la información de la API
 const getApiInfo = async () => {
   try {
     const response = await axios.get(
@@ -18,6 +17,13 @@ const getApiInfo = async () => {
         img: `https://typedex.app/images/ui/types/dark/${type.type.name}.svg`,
       }));
 
+      const existingPokemon = await Pokemon.findOne({
+        where: { name: pokemonData.name },
+      });
+      if (existingPokemon) {
+        return null;
+      }
+
       return {
         id: pokemonData.id,
         name: pokemonData.name,
@@ -29,18 +35,19 @@ const getApiInfo = async () => {
         speed: pokemonData.stats[5].base_stat,
         height: pokemonData.height,
         weight: pokemonData.weight,
+        created: false,
       };
     });
 
     const pokemons = await Promise.all(pokemonPromises);
-    return pokemons;
+    const filteredPokemons = pokemons.filter((pokemon) => pokemon !== null);
+    return filteredPokemons;
   } catch (error) {
     console.log(error);
     return [];
   }
 };
 
-// Función para obtener la información de todos los Pokémon en la base de datos
 const getDbInfo = async () => {
   try {
     const arrayPokemonsDb = await Pokemon.findAll({
@@ -67,6 +74,7 @@ const getDbInfo = async () => {
       speed: pokemon.speed,
       height: pokemon.height,
       weight: pokemon.weight,
+      createdInBd: true,
     }));
   } catch (error) {
     console.log(error);
@@ -74,7 +82,7 @@ const getDbInfo = async () => {
   }
 };
 
-// Función para obtener todos los Pokémon, tanto de la API como de la base de datos
+
 const getAllPokemon = async () => {
   const apiInfo = await getApiInfo();
   const dbInfo = await getDbInfo();
