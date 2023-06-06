@@ -1,10 +1,14 @@
 const axios = require("axios");
 const { Pokemon, Type } = require("../db");
 
-const getApiInfo = async () => {
+const TOTAL_POKEMONS = 500;
+
+const getApiInfo = async (page) => {
   try {
     const response = await axios.get(
-      "https://pokeapi.co/api/v2/pokemon?limit=100"
+      `https://pokeapi.co/api/v2/pokemon?limit=12&offset=${
+        (page - 1) * 12
+      }`
     );
     const results = response.data.results;
 
@@ -82,11 +86,19 @@ const getDbInfo = async () => {
   }
 };
 
-
 const getAllPokemon = async () => {
-  const apiInfo = await getApiInfo();
+  let allPokemon = [];
+
+  const totalPages = Math.ceil(TOTAL_POKEMONS / 12);
+
+  for (let page = 1; page <= totalPages; page++) {
+    const apiInfo = await getApiInfo(page);
+    allPokemon = allPokemon.concat(apiInfo);
+  }
+
   const dbInfo = await getDbInfo();
-  const allPokemon = apiInfo.concat(dbInfo);
+  allPokemon = allPokemon.concat(dbInfo);
+
   return allPokemon;
 };
 
