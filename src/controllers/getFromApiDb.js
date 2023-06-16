@@ -39,7 +39,7 @@ const getApiInfo = async (page) => {
         speed: pokemonData.stats[5].base_stat,
         height: pokemonData.height,
         weight: pokemonData.weight,
-        created: false,
+        createdInBd: false,
       };
     });
 
