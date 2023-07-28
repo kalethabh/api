@@ -1,14 +1,13 @@
-const axios = require("axios");
 const { Pokemon, Type } = require("../db");
+const axios = require("axios");
 
 const TOTAL_POKEMONS = 500;
+let cachedPokemonData = null;
 
 const getApiInfo = async (page) => {
   try {
     const response = await axios.get(
-      `https://pokeapi.co/api/v2/pokemon?limit=12&offset=${
-        (page - 1) * 12
-      }`
+      `https://pokeapi.co/api/v2/pokemon?limit=12&offset=${(page - 1) * 12}`
     );
     const results = response.data.results;
 
@@ -28,19 +27,50 @@ const getApiInfo = async (page) => {
         return null;
       }
 
-      return {
-        id: pokemonData.id,
-        name: pokemonData.name,
-        img: pokemonData.sprites.other.home.front_default,
-        types: types,
-        hp: pokemonData.stats[0].base_stat,
-        attack: pokemonData.stats[1].base_stat,
-        defense: pokemonData.stats[2].base_stat,
-        speed: pokemonData.stats[5].base_stat,
-        height: pokemonData.height,
-        weight: pokemonData.weight,
-        createdInBd: false,
-      };
+      // Insertar el Pokémon en la base de datos
+      try {
+        const createdPokemon = await Pokemon.create({
+          id: pokemonData.id,
+          name: pokemonData.name,
+          img: pokemonData.sprites.other.home.front_default,
+          hp: pokemonData.stats[0].base_stat,
+          attack: pokemonData.stats[1].base_stat,
+          defense: pokemonData.stats[2].base_stat,
+          speed: pokemonData.stats[5].base_stat,
+          height: pokemonData.height,
+          weight: pokemonData.weight,
+          createdInBd: true,
+        });
+
+        // Asociar los tipos del Pokémon a través de la tabla intermedia 'pokemon_types'
+        for (const type of types) {
+          const [createdType] = await Type.findOrCreate({
+            where: { name: type.name },
+            defaults: { img: type.img },
+          });
+          await createdPokemon.addType(createdType);
+        }
+
+        return {
+          id: createdPokemon.id,
+          name: createdPokemon.name,
+          img: createdPokemon.img,
+          types: types,
+          hp: createdPokemon.hp,
+          attack: createdPokemon.attack,
+          defense: createdPokemon.defense,
+          speed: createdPokemon.speed,
+          height: createdPokemon.height,
+          weight: createdPokemon.weight,
+          createdInBd: true,
+        };
+      } catch (error) {
+        console.error(
+          "Error al insertar el Pokémon en la base de datos:",
+          error
+        );
+        return null;
+      }
     });
 
     const pokemons = await Promise.all(pokemonPromises);
@@ -87,6 +117,11 @@ const getDbInfo = async () => {
 };
 
 const getAllPokemon = async () => {
+  if (cachedPokemonData) {
+    // Si los datos están en caché, devolverlos directamente
+    return cachedPokemonData;
+  }
+
   let allPokemon = [];
 
   const totalPages = Math.ceil(TOTAL_POKEMONS / 12);
@@ -98,6 +133,9 @@ const getAllPokemon = async () => {
 
   const dbInfo = await getDbInfo();
   allPokemon = allPokemon.concat(dbInfo);
+
+  // Almacenar los datos en caché o en una variable global
+  cachedPokemonData = allPokemon;
 
   return allPokemon;
 };
