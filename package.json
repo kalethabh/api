@@ -1,5 +1,5 @@
 {
-  "name": "api",
+  "name": "register",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -7,7 +7,7 @@
     "start": "nodemon -L",
     "test": "mocha -w ./tests/**/*.spec.js"
   },
-  "author": "Henry",
+  "author": "KalethDev",
   "license": "ISC",
   "engines": {
     "node": ">=12.18.3",
